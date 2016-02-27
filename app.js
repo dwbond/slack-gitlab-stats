@@ -102,16 +102,16 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				    "icon_url": "https://gitlab.com/uploads/project/avatar/13083/gitlab-logo-square.png",
 				    "attachments": [
 				      {
-				        "fallback": "Look at all dem commits dis week!",
-				        "color": "#F05033",
-				        "text": "*Congrats to these users for their contributions to `master` in SRCT projects over the past week!*",
-				        "mrkdwn_in": ["text", "pretext", "fields"],
-				        "fields": [
-				        	{
-				        		"value": util.format("```%s```", message),
-				        		"short": true
-				        	}
-				        ]
+						"fallback": "Look at all dem commits dis week!",
+						"color": "#F05033",
+						"text": "*Congrats to these users for their contributions to `master` in SRCT projects over the past week!*",
+						"mrkdwn_in": ["text", "pretext", "fields"],
+						"fields": [
+							{
+								"value": util.format("```%s```", message),
+								"short": true
+							}
+						]
 				      }
 				    ]
 				  })
@@ -160,16 +160,16 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 					    "icon_url": "https://gitlab.com/uploads/project/avatar/13083/gitlab-logo-square.png",
 					    "attachments": [
 					      {
-					        "fallback": "Look at all dem commits dis week!",
-					        "color": "#F05033",
-					        "text": util.format("*Check out some of the %s current open issue%s Total Requests %s!*", totalIssues, totalIssues > 1 ? "s" : "", totalCalls),
-					        "mrkdwn_in": ["text", "pretext", "fields"],
-					        "fields": [
-					        	{
-					        		"value": util.format("```%s```", message),
-					        		"short": true
-					        	}
-					        ]
+							"fallback": "Look at all dem commits dis week!",
+							"color": "#F05033",
+							"text": util.format("*Check out some of the %s current open issue%s Total Requests %s!*", totalIssues, totalIssues > 1 ? "s" : "", totalCalls),
+							"mrkdwn_in": ["text", "pretext", "fields"],
+							"fields": [
+								{
+									"value": util.format("```%s```", message),
+									"short": true
+								}
+							]
 					      }
 					    ]
 					  })
