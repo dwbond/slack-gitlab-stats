@@ -5,71 +5,106 @@ const config = require("./config.json");
 const util = require("util");
 const async = require("async");
 const moment = require("moment");
-const print = console.log;
 
-let totalCalls = 0
+function getCommits(projectId, callback) {
+	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/repository/commits?per_page=100&private_token=" + config["private-token"], function(err, res, body) {
+		totalCalls++
+		if (err) {
+			callback(err, null);
+		}
+		body = JSON.parse(body);
+		let recentCommits = [];
+		for (let i=0,len=body.length; i < len; i++) {
+			let commitTime = moment(body[i].created_at)
+			if (commitTime.isAfter(endDate)) {
+				recentCommits.push(body[i])
+			}
+			
+		}
+		callback(null, {"commits":recentCommits, "id": projectId})
+	});
+}
+function getIssues(projectId, callback) {
+	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/issues?state=opened&per_page=100&private_token=" + config["private-token"], function(err, res, body) {
+		totalCalls++
+		if (err) {
+			callback(err, null);
+		}
+		body = JSON.parse(body);
+		callback(null, body)
+	});
+}
+// function getMRs(projectId, callback) {
+// 	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/merge_requests?private_token=" + config["private-token"], function(err, res, body) {
+// 		if (err) {
+// 			callback(err, null);
+// 		}
+// 		body = JSON.parse(body);
+// 		let recentMRs = [];
+// 		for (let i=0,len=body.length; i < len; i++) {
+// 			let MRTime = moment(body[i].created_at)
+// 			if (MRTime.isAfter(endDate)) {
+// 				recentMRs.push(body[i])
+// 			}
+// 		}
+// 		callback(null, {"merges": })
+// 	})
+// }
+
+// Keep track of how many HTTP requests we make
+let totalCalls = 0;
+
+// How far back do we want to include commits?
 let endDate = moment().subtract(1, "d");
 
+// Get all projects in a group's namespace
+// In our specific case, that's SRCT
 request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?per_page=100&private_token="+config["private-token"], function(err, res, body) {
-	totalCalls++
+	// Increment request counter
+	totalCalls++;
+
+	// Initialze a few core variables
+
+	// A list of all projects owned by configured group
 	let projectIds = [];
+
+	// An object of { projectId: numberOfCommits }
 	let projectCommits = {}
+
+	// An object of { projectId: projectName }
 	let projectNames = {}
+
+	// Our body is JSON; make it so!
 	body = JSON.parse(body);
+
+	// Iterate through the body to isolate the projectIds
 	for (let i=0,len=body.length; i < len; i++) {
 		projectNames[body[i].id] = body[i].name;
 		projectIds.push(body[i].id);
 	}
-	function getCommits(projectId, callback) {
-		request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/repository/commits?per_page=100&private_token=" + config["private-token"], function(err, res, body) {
-			totalCalls++
-			if (err) {
-				callback(err, null);
-			}
-			body = JSON.parse(body);
-			let recentCommits = [];
-			for (let i=0,len=body.length; i < len; i++) {
-				let commitTime = moment(body[i].created_at)
-				if (commitTime.isAfter(endDate)) {
-					recentCommits.push(body[i])
-				}
-				
-			}
-			callback(null, {"commits":recentCommits, "id": projectId})
-		});
-	}
-	// function getMRs(projectId, callback) {
-	// 	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/merge_requests?private_token=" + config["private-token"], function(err, res, body) {
-	// 		if (err) {
-	// 			callback(err, null);
-	// 		}
-	// 		body = JSON.parse(body);
-	// 		let recentMRs = [];
-	// 		for (let i=0,len=body.length; i < len; i++) {
-	// 			let MRTime = moment(body[i].created_at)
-	// 			if (MRTime.isAfter(endDate)) {
-	// 				recentMRs.push(body[i])
-	// 			}
-	// 		}
-	// 		callback(null, {"merges": })
-	// 	})
-	// }
-	print(projectNames);
+
+	// Get a list of all slack channels for later
 	request.get("https://slack.com/api/channels.list?token="+config["slack-token"], function(err, res, body) {
+		// Iterate request counter
 		totalCalls++
+
+		// An object containing { channelId: channelName }
 		let channelsList = {};
+
+		// Yet another JSON parse
 		body = JSON.parse(body)
+
+		// Populate channelsList appropriately
 		for (let i = 0, len = body.channels.length; i < len; i++) {
 			let channel = body.channels[i];
 			channelsList[channel.name] = channel.id;
 		}
+
+		// Async-ly load all data from the Gitlab API
 		async.map(projectIds, getCommits, function(err, results) {
 			let userCommits = {}
 			for (let i = 0, len = results.length; i < len; i++) {
 				let result = results[i];
-				// print("Project: "+projectNames[result["id"]]);
-				// print("# Commits: "+result["commits"].length)
-				// console.log(err);
 				for (let j = 0, len = result.commits.length; j < len; j++) {
 					let commit = result.commits[j];
 					if (!(commit.author_name in userCommits)) {
@@ -120,16 +155,6 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				  body=="ok"||console.log(body);
 				});
 			} else {
-				function getIssues(projectId, callback) {
-					request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/issues?state=opened&per_page=100&private_token=" + config["private-token"], function(err, res, body) {
-						totalCalls++
-						if (err) {
-							callback(err, null);
-						}
-						body = JSON.parse(body);
-						callback(null, body)
-					});
-				}
 				async.map(projectIds, getIssues, function(err, results) {
 					let issues = []
 					for (let i = 0, len = results.length; i < len; i++) {
@@ -143,7 +168,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 						}
 						projectIssues[issue.project_id] += 1;
 					}
-					let message = util.format("There are currently %s total open issues!\n", projectIssues.length);
+					let message = "";
 					let totalIssues = 0;
 					for (let i in projectIssues) {
 						let count = projectIssues[i]
