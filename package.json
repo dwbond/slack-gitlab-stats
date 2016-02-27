@@ -17,6 +17,8 @@
   "author": "Nicholas Anderson <nander13@gmu.edu>",
   "license": "MIT",
   "dependencies": {
+    "async": "^1.5.2",
+    "moment": "^2.11.2",
     "request": "^2.69.0"
   }
 }
