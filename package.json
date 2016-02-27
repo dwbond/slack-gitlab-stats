@@ -1,0 +1,22 @@
+{
+  "name": "slack-gitlab-stats",
+  "version": "1.0.0",
+  "description": "Make weekly posts to slack containing Gitlab commit statistics",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.gmu.edu/nander13/slack-gitlab-stats"
+  },
+  "keywords": [
+    "slack",
+    "gitlab"
+  ],
+  "author": "Nicholas Anderson <nander13@gmu.edu>",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.69.0"
+  }
+}
