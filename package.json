@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Make weekly posts to slack containing Gitlab commit statistics",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://git.gmu.edu/nander13/slack-gitlab-stats"

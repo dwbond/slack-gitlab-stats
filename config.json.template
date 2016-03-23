@@ -1,0 +1,8 @@
+{
+	"slack-hook": "https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxx",
+	"slack-token": "xxxx-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx-xxxxxx",
+	"private-token": "xxxxxxxxxxxxxxxxxxxx",
+	"slack-channel": "#general",
+	"groupid": 3,
+	"baseurl": "https://git.gmu.edu/"
+}

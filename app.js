@@ -55,7 +55,7 @@ function getIssues(projectId, callback) {
 let totalCalls = 0;
 
 // How far back do we want to include commits?
-let endDate = moment().subtract(1, "d");
+let endDate = moment().subtract(7, "d");
 
 // Get all projects in a group's namespace
 // In our specific case, that's SRCT
