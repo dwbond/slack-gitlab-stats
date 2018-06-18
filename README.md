@@ -11,7 +11,7 @@ Install node by following the directions [at the node js website](https://nodejs
 
 Begin by entering `npm install` to install the required packages.
 
-Copy config.json.template to config.json, and add your keys for the Slack and Gitlab.
+Copy config.json.template to config.json, and add your keys for [Slack](https://api.slack.com/apps?new_app=1) and [Gitlab](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html).
 
 Run `node app.js` to launch the program.
 
