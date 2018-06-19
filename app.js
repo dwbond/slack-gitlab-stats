@@ -63,7 +63,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 	// Increment request counter
 	totalCalls++;
 
-	// Initialze a few core variables
+	// Initialize a few core variables
 
 	// A list of all projects owned by configured group
 	let projectIds = [];
