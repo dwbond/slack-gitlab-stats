@@ -139,7 +139,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				      {
 						"fallback": "Look at all dem commits dis week!",
 						"color": "#F05033",
-						"text": "*Congrats to these users for their contributions to `master` in SRCT projects over the past week!*",
+						"text": "*Congrats to these users for their contributions in SRCT projects over the past week!*",
 						"mrkdwn_in": ["text", "pretext", "fields"],
 						"fields": [
 							{
