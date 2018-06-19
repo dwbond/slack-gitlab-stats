@@ -50,9 +50,9 @@ function getCommits(projectId, callback) {
                                                 console.log(recentCommits)
                                         }
 		                }
-		                callback(null, {"commits":recentCommits, "id": projectId})
                         });
                 }
+		callback(null, {"commits":recentCommits, "id": projectId})
 	});
 }
 
@@ -208,7 +208,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 						totalIssues += count
 						//message += util.format("%s made %d commit%s this week!\n", i, totalIssues, totalIssues > 1 ? "s" : "")
 						message += util.format("%d open issue%s in <#%s|%s>\n", count, count > 1 ? "s" : "", channelsList[name], name)
-                                        }
+					}
 					request.post({
 					  url: config["slack-hook"],
 					  body: JSON.stringify({
