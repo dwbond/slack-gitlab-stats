@@ -7,23 +7,55 @@ const async = require("async");
 const moment = require("moment");
 
 function getCommits(projectId, callback) {
-	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/repository/commits?per_page=100&private_token=" + config["private-token"], function(err, res, body) {
+        // get the list of branches for the projects
+	request.get(config["baseurl"] + "api/v3/projects/" + projectId +
+                "/repository/branches?per_page=100&private_token=" + config["private-token"],
+                function(err, res, body) {
+
 		totalCalls++
+
 		if (err) {
 			callback(err, null);
 		}
+
 		body = JSON.parse(body);
+                // iterate over the branches
+                // and store the branch name if the branch is protected
+                let protectedBranches = [];
+                for (let i=0, len=body.length; i < len; i++) {
+                        // always include the master branch
+                        if ((body[i].name == "master") || (body[i].protected == true)) {
+                                protectedBranches.push(body[i].name);
+                        }
+                }
+
 		let recentCommits = [];
-		for (let i=0,len=body.length; i < len; i++) {
-			let commitTime = moment(body[i].created_at)
-			if (commitTime.isAfter(endDate)) {
-				recentCommits.push(body[i])
-			}
-			
-		}
-		callback(null, {"commits":recentCommits, "id": projectId})
+                for (let i=0, len=protectedBranches.length; i < len; i++){
+	                request.get(config["baseurl"] + "api/v3/projects/" + projectId +
+                                "/repository/commits?ref_name=" + protectedBranches[i] +
+                                "&per_page=100&private_token=" + config["private-token"],
+                                function(err, res, body) {
+
+		                totalCalls++
+
+		                if (err) {
+                                        callback(err, null);
+		                }
+
+		                body = JSON.parse(body);
+		                for (let i=0,len=body.length; i < len; i++) {
+                                        let commitTime = moment(body[i].created_at)
+                                        if (commitTime.isAfter(endDate)) {
+	                                        recentCommits.push(body[i]);
+                                                console.log(recentCommits)
+                                        }
+		                }
+		                callback(null, {"commits":recentCommits, "id": projectId})
+                        });
+                }
 	});
 }
+
 function getIssues(projectId, callback) {
 	request.get(config["baseurl"] + "api/v3/projects/" + projectId + "/issues?state=opened&per_page=100&private_token=" + config["private-token"], function(err, res, body) {
 		totalCalls++
@@ -176,7 +208,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 						totalIssues += count
 						//message += util.format("%s made %d commit%s this week!\n", i, totalIssues, totalIssues > 1 ? "s" : "")
 						message += util.format("%d open issue%s in <#%s|%s>\n", count, count > 1 ? "s" : "", channelsList[name], name)
-					}	
+                                        }
 					request.post({
 					  url: config["slack-hook"],
 					  body: JSON.stringify({
