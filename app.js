@@ -130,7 +130,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 	}
 
 	// Get a list of all slack channels for later
-	request.get("https://slack.com/api/channels.list?token="+config["slack-token"], function(err, res, body) {
+	/*request.get("https://slack.com/api/channels.list?token="+config["slack-token"], function(err, res, body) {
 		// Iterate request counter
 		totalCalls++
 
@@ -144,7 +144,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 		for (let i = 0, len = body.channels.length; i < len; i++) {
 			let channel = body.channels[i];
 			channelsList[channel.name] = channel.id;
-		}
+		}*/
 
 		// Async-ly load all data from the Gitlab API
 		async.map(projectIds, getCommits, function(err, results) {
@@ -169,13 +169,15 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				let projectBreakdown = ""
 				for (let j in user) {
 					totalCommits += user[j]
-					projectBreakdown += util.format(" - %d commit%s in <#%s|%s>\n", user[j], user[j] > 1 ? "s" : "", channelsList[j], j)
+					//projectBreakdown += util.format(" - %d commit%s in <#%s|%s>\n", user[j], user[j] > 1 ? "s" : "", channelsList[j], j)
+					projectBreakdown += util.format(" - %d commit%s in <#%s|%s>\n", user[j], user[j] > 1 ? "s" : "", "#srctjerk", j)
 				}
 				message += util.format("%s made %d commit%s this week!\n", i, totalCommits, totalCommits > 1 ? "s" : "")
 				message += projectBreakdown
 			}
 			if (message.length > 0) {
-				request.post({
+                                console.log(message);
+				/*request.post({
 				  url: config["slack-hook"],
 				  body: JSON.stringify({
 				    "channel": config["slack-channel"],
@@ -199,7 +201,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				}, function(err, res, body) {
 				  err&&console.log(err);
 				  body=="ok"||console.log(body);
-				});
+				});*/
 			} else {
 				async.map(projectIds, getIssues, function(err, results) {
 					let issues = []
@@ -221,9 +223,11 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 						let name = projectNames[i]
 						totalIssues += count
 						//message += util.format("%s made %d commit%s this week!\n", i, totalIssues, totalIssues > 1 ? "s" : "")
-						message += util.format("%d open issue%s in <#%s|%s>\n", count, count > 1 ? "s" : "", channelsList[name], name)
+						//message += util.format("%d open issue%s in <#%s|%s>\n", count, count > 1 ? "s" : "", channelsList[name], name)
+						message += util.format("%d open issue%s in <#%s|%s>\n", count, count > 1 ? "s" : "", "#srctjerk", name)
 					}
-					request.post({
+                                        console.log(message);
+					/*request.post({
 					  url: config["slack-hook"],
 					  body: JSON.stringify({
 					    "channel": config["slack-channel"],
@@ -247,7 +251,7 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 					}, function(err, res, body) {
 					  err&&console.log(err);
 					  body=="ok"||console.log(body);
-					});
+					});*/
 				});
 			}
 		});
