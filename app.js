@@ -6,6 +6,33 @@ const util = require("util");
 const async = require("async");
 const moment = require("moment");
 
+function getCommitsByBranch(branch, projectId, callback) {
+        let url = config["baseurl"] + "api/v3/projects/" + projectId +
+                "/repository/commits?ref_name=" + branch +
+                "&per_page=100&private_token=" + config["private-token"];
+
+        request.get(url, (err, res, body) => {
+	        totalCalls++
+
+		if (err) {
+                        callback(err, null);
+		}
+
+                body = JSON.parse(body);
+	        let recentCommits = [];
+
+		for (let i=0,len=body.length; i < len; i++) {
+                        let commitTime = moment(body[i].created_at)
+                        if (commitTime.isAfter(endDate)) {
+	                        recentCommits.push(body[i]);
+                                console.log(recentCommits.length);
+                        }
+		}
+                callback(null, recentCommits);
+        });
+
+}
+
 function getCommits(projectId, callback) {
         // get the list of branches for the projects
 	request.get(config["baseurl"] + "api/v3/projects/" + projectId +
@@ -29,30 +56,17 @@ function getCommits(projectId, callback) {
                         }
                 }
 
-		let recentCommits = [];
-                for (let i=0, len=protectedBranches.length; i < len; i++){
-	                request.get(config["baseurl"] + "api/v3/projects/" + projectId +
-                                "/repository/commits?ref_name=" + protectedBranches[i] +
-                                "&per_page=100&private_token=" + config["private-token"],
-                                function(err, res, body) {
+                async.map(protectedBranches, getCommitsByBranch, function(err, results) {
+                        if (err) {
+                                console.log(err);
+                        }
 
-		                totalCalls++
-
-		                if (err) {
-                                        callback(err, null);
-		                }
-
-		                body = JSON.parse(body);
-		                for (let i=0,len=body.length; i < len; i++) {
-                                        let commitTime = moment(body[i].created_at)
-                                        if (commitTime.isAfter(endDate)) {
-	                                        recentCommits.push(body[i]);
-                                                console.log(recentCommits)
-                                        }
-		                }
+		        callback(null, {
+                                "commits": results.flat(2),
+                                "id": projectId
                         });
-                }
-		callback(null, {"commits":recentCommits, "id": projectId})
+
+                });
 	});
 }
 
