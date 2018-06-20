@@ -255,5 +255,5 @@ request.get(config["baseurl"] + "api/v3/groups/"+config["groupid"]+"/projects?pe
 				});
 			}
 		});
-	});
+	//});
 });
